@@ -13,6 +13,10 @@ class UserRole(enum.StrEnum):
     ADMIN = "admin"
 
 
+def _role_values(enum_class: type[UserRole]) -> list[str]:
+    return [member.value for member in enum_class]
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -20,7 +24,9 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(320), unique=True, index=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String(512), nullable=False)
     role: Mapped[UserRole] = mapped_column(
-        Enum(UserRole, name="user_role"), server_default=UserRole.USER.value, nullable=False
+        Enum(UserRole, name="user_role", values_callable=_role_values),
+        server_default=UserRole.USER.value,
+        nullable=False,
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
