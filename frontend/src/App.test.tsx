@@ -13,6 +13,18 @@ describe("App", () => {
       screen.getByRole("heading", { name: /drive what moves you/i }),
     ).toBeVisible();
     expect(screen.getByText(/illustrative models and prices/i)).toBeVisible();
+    const navigation = screen.getByRole("navigation", {
+      name: "Collection navigation",
+    });
+    expect(
+      within(navigation).getByRole("link", { name: "Compare" }),
+    ).toHaveAttribute("href", "/#compare");
+    expect(
+      within(navigation).getByRole("link", { name: "Price watch" }),
+    ).toHaveAttribute("href", "/#prices");
+    expect(
+      screen.getByRole("region", { name: /showroom at a glance/i }),
+    ).toBeVisible();
   });
 
   it("keeps the showroom visible and filters by category", () => {

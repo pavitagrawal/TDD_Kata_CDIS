@@ -117,62 +117,92 @@ export function InventoryPage({
 
   return (
     <section aria-labelledby="showroom-heading">
-      <div className="relative isolate min-h-[410px] overflow-hidden rounded-[2rem] bg-[#171717] sm:min-h-[520px]">
-        <img
-          src="/images/showroom-hero.png"
-          alt="Silver grand touring car beside the coast"
-          className="absolute inset-0 h-full w-full object-cover object-[65%_center] brightness-50"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/70 to-transparent" />
-        <div className="relative max-w-xl px-7 py-16 sm:px-14 sm:py-24">
-          <p className="text-xs font-bold uppercase tracking-[0.26em] text-red-400">
-            The Northstar collection
-          </p>
-          <h1
-            id="showroom-heading"
-            className="mt-5 text-5xl font-bold tracking-[-0.055em] text-white sm:text-7xl"
-          >
-            Drive what moves you.
-          </h1>
-          <p className="mt-6 max-w-sm text-base leading-7 text-stone-200 sm:text-lg">
-            Discover thoughtfully designed cars for every kind of journey.
-          </p>
+      <div className="editorial-hero relative overflow-hidden border-x border-b border-stone-800 px-6 pb-16 pt-20 text-center sm:px-12 sm:pb-20 sm:pt-24">
+        <div className="mx-auto w-fit border border-red-700 bg-red-950/40 px-4 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-red-300 sm:text-xs">
+          <span aria-hidden="true" className="mr-2 text-red-500">
+            ●
+          </span>{" "}
+          The Northstar motor collection
+        </div>
+        <h1
+          id="showroom-heading"
+          className="mx-auto mt-7 max-w-5xl font-serif text-5xl font-bold leading-[0.99] tracking-[-0.055em] text-[#f6f1ea] sm:text-7xl lg:text-[6.5rem]"
+        >
+          Drive what <span className="text-red-500">moves</span> you.
+        </h1>
+        <p className="mx-auto mt-8 max-w-2xl text-base leading-8 text-stone-300 sm:text-xl">
+          Explore iconic machines, compare the details and find your next drive
+          in a curated automotive workspace.
+        </p>
+        <div className="mt-9 flex flex-wrap justify-center gap-3">
           <a
             href="#explore"
-            className="mt-8 inline-flex rounded-full bg-red-600 px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-red-500 focus:outline-none focus:ring-4 focus:ring-red-500/30"
+            className="border border-red-500 bg-red-600 px-6 py-3.5 text-sm font-bold text-white shadow-[4px_4px_0_#6a1319] transition hover:bg-red-500"
           >
-            Explore the lineup{" "}
-            <span aria-hidden="true" className="ml-2">
-              ↗
-            </span>
+            Explore the collection →
+          </a>
+          <a
+            href="#compare"
+            className="border border-stone-500 bg-[#171717] px-6 py-3.5 text-sm font-bold text-white transition hover:border-red-500"
+          >
+            Compare cars
           </a>
         </div>
+        <p className="mt-10 text-[10px] font-bold uppercase tracking-[0.22em] text-stone-500 sm:text-xs">
+          Six iconic profiles &nbsp;·&nbsp; Six design concepts &nbsp;·&nbsp;
+          Source-linked prices
+        </p>
       </div>
 
-      <div className="mt-8 grid grid-cols-3 gap-3 rounded-3xl border border-stone-800 bg-[#171717] p-5 text-center shadow-sm sm:p-7">
-        <div>
-          <p className="text-xl font-bold sm:text-2xl">
-            {String(iconicCars.length).padStart(2, "0")}
-          </p>
-          <p className="mt-1 text-xs text-stone-400 sm:text-sm">
-            Iconic profiles
-          </p>
-        </div>
-        <div className="border-x border-stone-800">
-          <p className="text-xl font-bold sm:text-2xl">
-            {String(new Set(iconicCars.map((car) => car.brand)).size).padStart(
-              2,
-              "0",
-            )}
-          </p>
-          <p className="mt-1 text-xs text-stone-400 sm:text-sm">Famous makes</p>
-        </div>
-        <div>
-          <p className="text-xl font-bold sm:text-2xl">
-            {loading ? "…" : liveVehicles.length}
-          </p>
-          <p className="mt-1 text-xs text-stone-400 sm:text-sm">
-            Live listings
+      <div
+        role="region"
+        aria-label="Showroom at a glance"
+        className="grid grid-cols-2 border-x border-b border-stone-800 bg-[#161616] lg:grid-cols-4"
+      >
+        {[
+          [
+            String(iconicCars.length).padStart(2, "0"),
+            "Iconic profiles",
+            "Manufacturer-sourced stories",
+          ],
+          [
+            String(showroomVehicles.length).padStart(2, "0"),
+            "Design concepts",
+            "Illustrative collection",
+          ],
+          ["06", "Price references", "Linked to official sources"],
+          [
+            loading ? "…" : String(liveVehicles.length),
+            "Live listings",
+            "Fetched from inventory",
+          ],
+        ].map(([value, label, detail]) => (
+          <div
+            key={label}
+            className="border-b border-r border-stone-800 p-5 text-left last:border-r-0 sm:p-7 lg:border-b-0"
+          >
+            <p className="font-serif text-4xl font-bold text-[#f4eee8] sm:text-5xl">
+              {value}
+            </p>
+            <p className="mt-3 text-xs font-bold uppercase tracking-[0.14em] text-red-400">
+              {label}
+            </p>
+            <p className="mt-1 text-xs text-stone-500">{detail}</p>
+          </div>
+        ))}
+      </div>
+
+      <div id="showroom" className="scroll-mt-32 pt-16 sm:pt-20">
+        <p className="text-xs font-bold uppercase tracking-[0.22em] text-red-400">
+          01 / The collection
+        </p>
+        <div className="mt-3 flex flex-wrap items-end justify-between gap-5 border-b border-stone-700 pb-6">
+          <h2 className="max-w-2xl font-serif text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
+            An extraordinary car deserves a closer look.
+          </h2>
+          <p className="max-w-xs text-sm leading-6 text-stone-400">
+            Swipe through every featured model, then open its dedicated profile
+            for the details.
           </p>
         </div>
       </div>
@@ -187,7 +217,7 @@ export function InventoryPage({
 
       <div id="explore" className="scroll-mt-24 pt-16 sm:pt-24">
         <p className="text-xs font-bold uppercase tracking-[0.26em] text-red-500">
-          Find your next drive
+          04 / Find your next drive
         </p>
         <div className="mt-3 flex flex-wrap items-end justify-between gap-5">
           <div>

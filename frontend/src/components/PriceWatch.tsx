@@ -13,13 +13,14 @@ export function PriceWatch({ onOpenCar }: Props) {
   });
   return (
     <section
+      id="prices"
       className="mt-16 overflow-hidden rounded-3xl border border-stone-800 bg-[#171717]"
       aria-labelledby="price-watch-heading"
     >
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-stone-800 bg-gradient-to-r from-[#290909] to-[#171717] p-6 sm:p-8">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-red-400">
-            Market reference · Demo listings
+            03 / Market reference · Demo listings
           </p>
           <h2
             id="price-watch-heading"

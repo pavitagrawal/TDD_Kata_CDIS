@@ -13,12 +13,13 @@ export function CarComparison({ onOpenCar }: Props) {
 
   return (
     <section
+      id="compare"
       aria-labelledby="comparison-heading"
       className="mt-16 overflow-hidden rounded-[2rem] border border-stone-700 bg-[#171717]"
     >
       <div className="border-b border-stone-800 bg-[radial-gradient(circle_at_80%_20%,#3b0b0b,#171717_60%)] p-7 sm:p-10">
         <p className="text-xs font-bold uppercase tracking-[0.24em] text-red-400">
-          Compare · Decide · Explore
+          02 / Compare · Decide · Explore
         </p>
         <h2
           id="comparison-heading"
