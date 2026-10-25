@@ -1,9 +1,11 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import { App } from "./App";
 
 describe("App", () => {
+  beforeEach(() => window.history.replaceState({}, "", "/"));
+
   it("introduces the inventory workspace", () => {
     render(<App />);
 
@@ -36,5 +38,30 @@ describe("App", () => {
     );
     expect(screen.getByText(/demo checkout complete/i)).toBeVisible();
     expect(screen.getByText(/your cart is empty/i)).toBeVisible();
+  });
+
+  it("opens a dedicated, shareable iconic-car profile", () => {
+    render(<App />);
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /tesla.*model 3 performance.*explore model/i,
+      }),
+    );
+    expect(window.location.pathname).toBe("/cars/tesla-model-3-performance");
+    expect(
+      screen.getByRole("heading", { name: "Tesla Model 3 Performance" }),
+    ).toBeVisible();
+    expect(screen.getByText("316 mi")).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: /tesla model 3 specifications/i }),
+    ).toHaveAttribute("href", "https://www.tesla.com/model3");
+  });
+
+  it("loads an iconic-car profile directly from its URL", () => {
+    window.history.replaceState({}, "", "/cars/porsche-911-carrera");
+    render(<App />);
+    expect(
+      screen.getByRole("heading", { name: "Porsche 911 Carrera" }),
+    ).toBeVisible();
   });
 });

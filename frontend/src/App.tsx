@@ -8,10 +8,12 @@ import {
   type CartItem,
 } from "./cart/cart";
 import { PageHeader } from "./components/PageHeader";
+import { getIconicCar } from "./data/iconicCars";
 import { AdminInventoryPage } from "./pages/AdminInventoryPage";
 import { AuthPage } from "./pages/AuthPage";
 import { CartPage } from "./pages/CartPage";
 import { InventoryPage } from "./pages/InventoryPage";
+import { IconicCarPage } from "./pages/IconicCarPage";
 import type { Vehicle } from "./types/domain";
 
 export function App() {
@@ -20,24 +22,64 @@ export function App() {
     "inventory" | "login" | "register" | "admin" | "cart"
   >("inventory");
   const [cart, setCart] = useState<CartItem[]>(loadCart);
+  const [path, setPath] = useState(window.location.pathname);
+  useEffect(() => {
+    const onPopState = () => setPath(window.location.pathname);
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
   useEffect(() => saveCart(cart), [cart]);
+  const navigatePage = (nextPage: typeof page) => {
+    if (window.location.pathname !== "/") {
+      window.history.pushState({}, "", "/");
+      setPath("/");
+    }
+    setPage(nextPage);
+    window.scrollTo?.(0, 0);
+  };
+  const openIconicCar = (slug: string) => {
+    const nextPath = `/cars/${slug}`;
+    window.history.pushState({}, "", nextPath);
+    setPath(nextPath);
+    window.scrollTo?.(0, 0);
+  };
+  const carSlug = path.match(/^\/cars\/([^/]+)\/?$/)?.[1];
+  const iconicCar = carSlug ? getIconicCar(carSlug) : undefined;
   const addVehicle = (vehicle: Vehicle) =>
     setCart((current) => addToCart(current, vehicle));
   return (
     <div className="min-h-screen bg-[#0b0b0d] text-white">
       <PageHeader
-        onNavigate={setPage}
+        onNavigate={navigatePage}
         page={page}
         cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)}
       />
       <main className="mx-auto max-w-7xl px-5 py-7 sm:px-8 sm:py-10">
-        {page === "inventory" && (
+        {carSlug ? (
+          iconicCar ? (
+            <IconicCarPage
+              car={iconicCar}
+              onBack={() => navigatePage("inventory")}
+              onNavigate={openIconicCar}
+            />
+          ) : (
+            <div className="py-24 text-center">
+              <h1 className="text-4xl font-bold">Car profile not found</h1>
+              <button
+                className="mt-6 rounded-full bg-red-600 px-6 py-3 font-semibold"
+                onClick={() => navigatePage("inventory")}
+              >
+                Browse cars
+              </button>
+            </div>
+          )
+        ) : page === "inventory" ? (
           <InventoryPage
             onAddToCart={addVehicle}
-            onOpenCart={() => setPage("cart")}
+            onOpenCart={() => navigatePage("cart")}
+            onOpenIconicCar={openIconicCar}
           />
-        )}
-        {page === "cart" && (
+        ) : page === "cart" ? (
           <CartPage
             items={cart}
             onQuantity={(id, quantity) =>
@@ -52,29 +94,29 @@ export function App() {
               })
             }
             onClear={() => setCart([])}
-            onBrowse={() => setPage("inventory")}
-            onSignIn={() => setPage("login")}
+            onBrowse={() => navigatePage("inventory")}
+            onSignIn={() => navigatePage("login")}
+          />
+        ) : page === "admin" ? (
+          user?.role === "admin" ? (
+            <div className="admin-theme">
+              <AdminInventoryPage />
+            </div>
+          ) : (
+            <InventoryPage
+              onAddToCart={addVehicle}
+              onOpenCart={() => navigatePage("cart")}
+              onOpenIconicCar={openIconicCar}
+            />
+          )
+        ) : (
+          <AuthPage
+            mode={page}
+            onComplete={() =>
+              navigatePage(cart.length > 0 ? "cart" : "inventory")
+            }
           />
         )}
-        {page !== "inventory" &&
-          page !== "cart" &&
-          (page === "admin" ? (
-            user?.role === "admin" ? (
-              <div className="admin-theme">
-                <AdminInventoryPage />
-              </div>
-            ) : (
-              <InventoryPage
-                onAddToCart={addVehicle}
-                onOpenCart={() => setPage("cart")}
-              />
-            )
-          ) : (
-            <AuthPage
-              mode={page}
-              onComplete={() => setPage(cart.length > 0 ? "cart" : "inventory")}
-            />
-          ))}
       </main>
       <footer className="mt-16 border-t border-stone-800 bg-black px-5 py-10 text-center text-sm text-stone-500">
         <p className="font-black tracking-[-0.04em] text-white">

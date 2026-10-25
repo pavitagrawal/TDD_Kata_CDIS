@@ -3,6 +3,7 @@ import { api, apiConfigurationMessage, ApiError } from "../api/client";
 import { useAuth } from "../auth/useAuth";
 import { VehicleDetailsDialog } from "../components/VehicleDetailsDialog";
 import { VehicleCard } from "../components/VehicleCard";
+import { iconicCars } from "../data/iconicCars";
 import { showroomVehicles } from "../data/showroom";
 import type { Vehicle } from "../types/domain";
 
@@ -11,9 +12,14 @@ const categories = ["All", "Electric", "SUV", "Performance"];
 interface Props {
   onAddToCart: (vehicle: Vehicle) => void;
   onOpenCart: () => void;
+  onOpenIconicCar: (slug: string) => void;
 }
 
-export function InventoryPage({ onAddToCart, onOpenCart }: Props) {
+export function InventoryPage({
+  onAddToCart,
+  onOpenCart,
+  onOpenIconicCar,
+}: Props) {
   const { token } = useAuth();
   const [liveVehicles, setLiveVehicles] = useState<Vehicle[]>([]);
   const [category, setCategory] = useState("All");
@@ -56,6 +62,13 @@ export function InventoryPage({ onAddToCart, onOpenCart }: Props) {
     () =>
       showroomVehicles.filter((vehicle) => matches(vehicle, category, search)),
     [category, search],
+  );
+  const visibleIconic = iconicCars.filter(
+    (car) =>
+      (category === "All" || car.category === category) &&
+      `${car.brand} ${car.name} ${car.category}`
+        .toLowerCase()
+        .includes(search.trim().toLowerCase()),
   );
 
   const addVehicle = (vehicle: Vehicle) => {
@@ -101,14 +114,12 @@ export function InventoryPage({ onAddToCart, onOpenCart }: Props) {
         <div>
           <p className="text-xl font-bold sm:text-2xl">06</p>
           <p className="mt-1 text-xs text-stone-400 sm:text-sm">
-            Showroom models
+            Iconic profiles
           </p>
         </div>
         <div className="border-x border-stone-800">
           <p className="text-xl font-bold sm:text-2xl">03</p>
-          <p className="mt-1 text-xs text-stone-400 sm:text-sm">
-            Ways to drive
-          </p>
+          <p className="mt-1 text-xs text-stone-400 sm:text-sm">Famous makes</p>
         </div>
         <div>
           <p className="text-xl font-bold sm:text-2xl">
@@ -213,6 +224,58 @@ export function InventoryPage({ onAddToCart, onOpenCart }: Props) {
         </div>
       )}
 
+      {visibleIconic.length > 0 && (
+        <div className="mt-12">
+          <div className="mb-6">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-red-500">
+              The icons
+            </p>
+            <h3 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
+              Famous cars, closer up
+            </h3>
+            <p className="mt-2 text-sm text-stone-400">
+              Explore manufacturer-sourced facts, detailed specifications and a
+              dedicated page for each model. Editorial profiles are not live
+              stock.
+            </p>
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            {visibleIconic.map((car) => (
+              <button
+                key={car.slug}
+                type="button"
+                onClick={() => onOpenIconicCar(car.slug)}
+                className="group overflow-hidden rounded-3xl border border-stone-800 bg-[#171717] text-left transition hover:-translate-y-1 hover:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                <div className="relative overflow-hidden">
+                  <img
+                    src={car.image}
+                    alt={`Illustrative portrait of ${car.brand} ${car.name}`}
+                    loading="lazy"
+                    className="aspect-[16/10] w-full object-cover transition duration-500 group-hover:scale-105"
+                  />
+                  <span className="absolute left-4 top-4 rounded-full bg-black/80 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
+                    {car.category}
+                  </span>
+                </div>
+                <div className="p-6">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-red-400">
+                    {car.brand} · {car.edition}
+                  </p>
+                  <h4 className="mt-2 text-2xl font-bold tracking-tight">
+                    {car.name}
+                  </h4>
+                  <p className="mt-2 text-sm text-stone-400">{car.headline}</p>
+                  <span className="mt-5 inline-block text-sm font-bold text-white">
+                    Explore model <span className="text-red-400">↗</span>
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="mt-12">
         <div className="mb-5">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-red-500">
@@ -238,23 +301,25 @@ export function InventoryPage({ onAddToCart, onOpenCart }: Props) {
         </div>
       </div>
 
-      {visibleLive.length === 0 && visibleShowroom.length === 0 && (
-        <div className="mt-8 rounded-3xl border border-dashed border-stone-700 bg-stone-900 p-10 text-center">
-          <h3 className="text-xl font-bold">No cars match your search</h3>
-          <p className="mt-2 text-stone-400">
-            Try another model or choose All.
-          </p>
-          <button
-            className="mt-5 rounded-full bg-red-600 px-5 py-2.5 text-sm font-semibold text-white"
-            onClick={() => {
-              setSearch("");
-              setCategory("All");
-            }}
-          >
-            Clear filters
-          </button>
-        </div>
-      )}
+      {visibleLive.length === 0 &&
+        visibleShowroom.length === 0 &&
+        visibleIconic.length === 0 && (
+          <div className="mt-8 rounded-3xl border border-dashed border-stone-700 bg-stone-900 p-10 text-center">
+            <h3 className="text-xl font-bold">No cars match your search</h3>
+            <p className="mt-2 text-stone-400">
+              Try another model or choose All.
+            </p>
+            <button
+              className="mt-5 rounded-full bg-red-600 px-5 py-2.5 text-sm font-semibold text-white"
+              onClick={() => {
+                setSearch("");
+                setCategory("All");
+              }}
+            >
+              Clear filters
+            </button>
+          </div>
+        )}
 
       <div className="mt-20 rounded-[2rem] bg-gradient-to-r from-[#320707] to-black px-8 py-14 text-center text-white sm:px-16">
         <p className="text-xs font-bold uppercase tracking-[0.25em] text-stone-400">
