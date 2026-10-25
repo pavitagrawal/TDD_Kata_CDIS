@@ -4,9 +4,11 @@ import { useAuth } from "../auth/useAuth";
 import { VehicleDetailsDialog } from "../components/VehicleDetailsDialog";
 import { VehicleCard } from "../components/VehicleCard";
 import { FeaturedCarousel } from "../components/FeaturedCarousel";
+import { CarComparison } from "../components/CarComparison";
 import { iconicCars } from "../data/iconicCars";
 import { showroomVehicles } from "../data/showroom";
 import { getShowroomProfileByVehicleId } from "../data/showroomProfiles";
+import { filterInventory, type InventorySort } from "../data/inventoryView";
 import type { Vehicle } from "../types/domain";
 
 const categories = ["All", "Electric", "SUV", "Performance"];
@@ -31,6 +33,10 @@ export function InventoryPage({
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Vehicle | null>(null);
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [sort, setSort] = useState<InventorySort>("name");
+  const [inStockOnly, setInStockOnly] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -59,16 +65,36 @@ export function InventoryPage({
   }, [token]);
 
   const visibleLive = useMemo(
-    () => liveVehicles.filter((vehicle) => matches(vehicle, category, search)),
-    [liveVehicles, category, search],
+    () =>
+      filterInventory(
+        liveVehicles.filter((vehicle) => matches(vehicle, category, search)),
+        {
+          query: "",
+          stock: inStockOnly ? "available" : "all",
+          sort,
+          minPrice,
+          maxPrice,
+        },
+      ),
+    [liveVehicles, category, search, inStockOnly, sort, minPrice, maxPrice],
   );
   const visibleShowroom = useMemo(
     () =>
-      showroomVehicles.filter((vehicle) => matches(vehicle, category, search)),
-    [category, search],
+      inStockOnly
+        ? []
+        : filterInventory(
+            showroomVehicles.filter((vehicle) =>
+              matches(vehicle, category, search),
+            ),
+            { query: "", stock: "all", sort, minPrice, maxPrice },
+          ),
+    [category, search, inStockOnly, sort, minPrice, maxPrice],
   );
   const visibleIconic = iconicCars.filter(
     (car) =>
+      !inStockOnly &&
+      minPrice === "" &&
+      maxPrice === "" &&
       (category === "All" || car.category === category) &&
       `${car.brand} ${car.name} ${car.category}`
         .toLowerCase()
@@ -147,6 +173,8 @@ export function InventoryPage({
         onOpenShowroom={onOpenShowroomCar}
       />
 
+      <CarComparison onOpenCar={onOpenIconicCar} />
+
       <div id="explore" className="scroll-mt-24 pt-16 sm:pt-24">
         <p className="text-xs font-bold uppercase tracking-[0.26em] text-red-500">
           Find your next drive
@@ -187,6 +215,75 @@ export function InventoryPage({
             </button>
           ))}
         </div>
+        <details className="mt-6 rounded-2xl border border-stone-800 bg-[#171717] p-5">
+          <summary className="cursor-pointer text-sm font-semibold text-white">
+            Advanced inventory filters{" "}
+            <span className="ml-2 text-red-400">↗</span>
+          </summary>
+          <p className="mt-3 text-xs leading-5 text-stone-400">
+            Price and stock filters apply to live listings and illustrative
+            showroom prices. Editorial car profiles have no listing prices and
+            are hidden when these filters are active.
+          </p>
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <label className="text-xs font-semibold text-stone-400">
+              Minimum price
+              <input
+                type="number"
+                min="0"
+                value={minPrice}
+                onChange={(event) => setMinPrice(event.target.value)}
+                className="mt-2 w-full rounded-lg border border-stone-700 bg-stone-900 px-3 py-2.5 text-sm text-white"
+              />
+            </label>
+            <label className="text-xs font-semibold text-stone-400">
+              Maximum price
+              <input
+                type="number"
+                min="0"
+                value={maxPrice}
+                onChange={(event) => setMaxPrice(event.target.value)}
+                className="mt-2 w-full rounded-lg border border-stone-700 bg-stone-900 px-3 py-2.5 text-sm text-white"
+              />
+            </label>
+            <label className="text-xs font-semibold text-stone-400">
+              Sort by
+              <select
+                value={sort}
+                onChange={(event) =>
+                  setSort(event.target.value as InventorySort)
+                }
+                className="mt-2 w-full rounded-lg border border-stone-700 bg-stone-900 px-3 py-2.5 text-sm text-white"
+              >
+                <option value="name">Make & model</option>
+                <option value="price-low">Price: low to high</option>
+                <option value="price-high">Price: high to low</option>
+                <option value="stock-low">Stock: lowest first</option>
+              </select>
+            </label>
+            <label className="flex items-center gap-3 self-end rounded-lg border border-stone-700 bg-stone-900 px-3 py-2.5 text-sm font-semibold text-white">
+              <input
+                type="checkbox"
+                checked={inStockOnly}
+                onChange={(event) => setInStockOnly(event.target.checked)}
+                className="accent-red-600"
+              />{" "}
+              In-stock live listings only
+            </label>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setMinPrice("");
+              setMaxPrice("");
+              setSort("name");
+              setInStockOnly(false);
+            }}
+            className="mt-5 text-sm font-semibold text-red-400 underline"
+          >
+            Clear advanced filters
+          </button>
+        </details>
       </div>
 
       {apiConfigurationMessage && (

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { App } from "./App";
@@ -23,6 +23,38 @@ describe("App", () => {
 
     expect(screen.getByText("Roam XL")).toBeVisible();
     expect(screen.queryByText("Arc GT")).not.toBeInTheDocument();
+  });
+
+  it("compares two real cars without treating concepts as stock", () => {
+    render(<App />);
+    const comparison = screen.getByRole("region", { name: /two icons/i });
+    fireEvent.change(within(comparison).getByLabelText("Second car"), {
+      target: { value: "ford-mustang-gt" },
+    });
+    expect(
+      within(comparison).getByRole("heading", {
+        name: "Ford Mustang GT Fastback",
+      }),
+    ).toBeVisible();
+    expect(
+      within(comparison).getByText(/editorial comparison, not a stock/i),
+    ).toBeVisible();
+  });
+
+  it("uses advanced budget filters without hiding the existing storefront by default", () => {
+    render(<App />);
+    fireEvent.click(screen.getByText(/advanced inventory filters/i));
+    fireEvent.change(screen.getByLabelText("Maximum price"), {
+      target: { value: "50000" },
+    });
+    expect(screen.getByRole("heading", { name: "Arc" })).toBeVisible();
+    expect(
+      screen.queryByRole("heading", { name: "Arc GT" }),
+    ).not.toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Clear advanced filters" }),
+    );
+    expect(screen.getByRole("heading", { name: "Arc GT" })).toBeVisible();
   });
 
   it("adds a concept to the cart and completes demo checkout", () => {
@@ -92,7 +124,11 @@ describe("App", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("button", { name: "Next car" }));
     expect(
-      screen.getByRole("heading", { name: "Porsche 911 Carrera" }),
+      within(
+        screen.getByRole("region", {
+          name: /swipe through all featured cars/i,
+        }),
+      ).getByRole("heading", { name: "Porsche 911 Carrera" }),
     ).toBeVisible();
   });
 });
