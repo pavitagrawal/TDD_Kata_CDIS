@@ -31,6 +31,9 @@ export function VehicleCard({
         <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1 text-xs font-bold uppercase tracking-wider text-stone-900">
           {showroom ? "Concept" : vehicle.category}
         </span>
+        <span className="absolute bottom-3 right-4 rounded-full bg-white/80 px-2.5 py-1 text-[10px] font-medium text-stone-700">
+          Illustrative image
+        </span>
       </div>
       <div className="p-6">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
