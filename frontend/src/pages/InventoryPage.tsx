@@ -5,6 +5,7 @@ import { VehicleDetailsDialog } from "../components/VehicleDetailsDialog";
 import { VehicleCard } from "../components/VehicleCard";
 import { FeaturedCarousel } from "../components/FeaturedCarousel";
 import { CarComparison } from "../components/CarComparison";
+import { PriceWatch } from "../components/PriceWatch";
 import { iconicCars } from "../data/iconicCars";
 import { showroomVehicles } from "../data/showroom";
 import { getShowroomProfileByVehicleId } from "../data/showroomProfiles";
@@ -37,30 +38,38 @@ export function InventoryPage({
   const [maxPrice, setMaxPrice] = useState("");
   const [sort, setSort] = useState<InventorySort>("name");
   const [inStockOnly, setInStockOnly] = useState(false);
+  const [lastInventoryCheck, setLastInventoryCheck] = useState<Date | null>(
+    null,
+  );
 
   useEffect(() => {
     let active = true;
-    api
-      .vehicles({ limit: 100 }, token ?? undefined)
-      .then((data) => {
-        if (active) {
-          setLiveVehicles(data);
-          setMessage("");
-        }
-      })
-      .catch((error: unknown) => {
-        if (active)
-          setMessage(
-            error instanceof ApiError
-              ? error.message
-              : "Live stock is temporarily unavailable.",
-          );
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
+    const refresh = () =>
+      api
+        .vehicles({ limit: 100 }, token ?? undefined)
+        .then((data) => {
+          if (active) {
+            setLiveVehicles(data);
+            setMessage("");
+            setLastInventoryCheck(new Date());
+          }
+        })
+        .catch((error: unknown) => {
+          if (active)
+            setMessage(
+              error instanceof ApiError
+                ? error.message
+                : "Live stock is temporarily unavailable.",
+            );
+        })
+        .finally(() => {
+          if (active) setLoading(false);
+        });
+    void refresh();
+    const interval = window.setInterval(() => void refresh(), 60_000);
     return () => {
       active = false;
+      window.clearInterval(interval);
     };
   }, [token]);
 
@@ -174,6 +183,7 @@ export function InventoryPage({
       />
 
       <CarComparison onOpenCar={onOpenIconicCar} />
+      <PriceWatch onOpenCar={onOpenIconicCar} />
 
       <div id="explore" className="scroll-mt-24 pt-16 sm:pt-24">
         <p className="text-xs font-bold uppercase tracking-[0.26em] text-red-500">
@@ -321,7 +331,9 @@ export function InventoryPage({
               </h3>
             </div>
             <span className="rounded-full bg-stone-800 px-3 py-1 text-xs font-semibold text-stone-200">
-              Updated from our inventory
+              {lastInventoryCheck
+                ? `Inventory checked ${lastInventoryCheck.toLocaleTimeString()}`
+                : "Checking inventory"}
             </span>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
@@ -335,6 +347,16 @@ export function InventoryPage({
             ))}
           </div>
         </div>
+      )}
+      {!loading && liveVehicles.length === 0 && (
+        <p
+          className="mt-12 rounded-2xl border border-stone-700 bg-stone-900 p-5 text-sm text-stone-300"
+          role="status"
+        >
+          No live saleable listings are available right now. The car profiles
+          and showroom concepts below are clearly labelled demonstrations. Live
+          inventory is checked every minute while this page is open.
+        </p>
       )}
 
       {visibleIconic.length > 0 && (

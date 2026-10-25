@@ -116,17 +116,8 @@ export function App() {
             onQuantity={(id, quantity) =>
               setCart((current) => setCartQuantity(current, id, quantity))
             }
-            onPurchased={(id) =>
-              setCart((current) => {
-                const item = current.find((entry) => entry.vehicle.id === id);
-                return item
-                  ? setCartQuantity(current, id, item.quantity - 1)
-                  : current;
-              })
-            }
             onClear={() => setCart([])}
             onBrowse={() => navigatePage("inventory")}
-            onSignIn={() => navigatePage("login")}
           />
         ) : page === "admin" ? (
           user?.role === "admin" ? (

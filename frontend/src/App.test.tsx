@@ -97,6 +97,27 @@ describe("App", () => {
     ).toBeVisible();
   });
 
+  it("shows sourced demo prices and previews a booking without creating an appointment", () => {
+    render(<App />);
+    expect(
+      screen.getByRole("heading", { name: "The price watch" }),
+    ).toBeVisible();
+    expect(screen.getByRole("link", { name: "Toyota ↗" })).toHaveAttribute(
+      "href",
+      "https://www.toyota.com/grsupra/",
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: /Toyota GR Supra 3\.0 ↗/i }),
+    );
+    fireEvent.change(screen.getByLabelText("Preferred date"), {
+      target: { value: "2099-12-01" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Preview booking" }));
+    expect(screen.getByRole("status")).toHaveTextContent(
+      /no actual appointment or vehicle hold was created/i,
+    );
+  });
+
   it("opens a dedicated showroom concept page with labelled video inspiration", () => {
     render(<App />);
     fireEvent.click(screen.getAllByRole("button", { name: "Details" })[0]);

@@ -2,6 +2,7 @@ import {
   showroomProfiles,
   type ShowroomProfile,
 } from "../data/showroomProfiles";
+import { DemoBooking } from "../components/DemoBooking";
 
 interface Props {
   profile: ShowroomProfile;
@@ -44,6 +45,7 @@ export function ShowroomCarPage({ profile, onBack, onNavigate }: Props) {
         Illustrative image and model. Northstar showroom concepts are fictional,
         not live inventory or orderable production vehicles.
       </p>
+      <DemoBooking carName={`Northstar ${profile.model}`} />
 
       <div className="mt-14 grid gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(260px,0.7fr)]">
         <section>

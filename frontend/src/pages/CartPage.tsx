@@ -1,16 +1,12 @@
 import { useState } from "react";
-import { api, ApiError } from "../api/client";
-import { useAuth } from "../auth/useAuth";
 import { cartTotal, type CartItem } from "../cart/cart";
 import { isShowroomVehicle, vehicleImage } from "../data/showroom";
 
 interface Props {
   items: CartItem[];
   onQuantity: (id: string, quantity: number) => void;
-  onPurchased: (id: string) => void;
   onClear: () => void;
   onBrowse: () => void;
-  onSignIn: () => void;
 }
 
 const money = (amount: number) =>
@@ -20,16 +16,7 @@ const money = (amount: number) =>
     maximumFractionDigits: 0,
   }).format(amount);
 
-export function CartPage({
-  items,
-  onQuantity,
-  onPurchased,
-  onClear,
-  onBrowse,
-  onSignIn,
-}: Props) {
-  const { token } = useAuth();
-  const [pending, setPending] = useState(false);
+export function CartPage({ items, onQuantity, onClear, onBrowse }: Props) {
   const [error, setError] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const conceptCount = items.filter((item) =>
@@ -37,7 +24,7 @@ export function CartPage({
   ).length;
   const liveCount = items.length - conceptCount;
 
-  const checkout = async () => {
+  const checkout = () => {
     setError("");
     setConfirmation("");
     if (conceptCount && liveCount) {
@@ -53,30 +40,9 @@ export function CartPage({
       );
       return;
     }
-    if (!token) {
-      onSignIn();
-      return;
-    }
-    setPending(true);
-    let completed = 0;
-    try {
-      for (const item of items) {
-        for (let index = 0; index < item.quantity; index++) {
-          await api.purchase(item.vehicle.id, token);
-          onPurchased(item.vehicle.id);
-          completed++;
-        }
-      }
-      setConfirmation(
-        `${completed} vehicle ${completed === 1 ? "reservation" : "reservations"} completed. No online payment was taken.`,
-      );
-    } catch (reason) {
-      setError(
-        `${completed ? `${completed} reservation(s) completed. ` : ""}${reason instanceof ApiError ? reason.message : "Checkout could not be completed."} Remaining items are still in your cart.`,
-      );
-    } finally {
-      setPending(false);
-    }
+    setError(
+      "Online orders and reservations are not yet available for live inventory. No payment or vehicle hold was made; your selection remains in the cart.",
+    );
   };
 
   return (
@@ -202,18 +168,15 @@ export function CartPage({
             <p className="mt-4 text-xs leading-5 text-stone-400">
               {conceptCount
                 ? "Concept checkout is a simulation. No payment, order, or vehicle reservation will be created."
-                : "Live checkout updates inventory but does not collect online payment."}
+                : "Live inventory can be browsed, but online orders and reservations are not yet enabled. No payment will be collected."}
             </p>
             <button
-              disabled={pending}
-              onClick={() => void checkout()}
+              onClick={checkout}
               className="mt-6 w-full rounded-full bg-red-600 px-5 py-3 font-bold text-white hover:bg-red-500 disabled:opacity-50"
             >
-              {pending
-                ? "Processing…"
-                : conceptCount
-                  ? "Complete demo checkout"
-                  : "Reserve cars"}
+              {conceptCount
+                ? "Complete demo checkout"
+                : "Check ordering availability"}
             </button>
             <button
               onClick={onBrowse}

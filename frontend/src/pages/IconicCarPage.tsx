@@ -1,4 +1,6 @@
 import { iconicCars, type IconicCar } from "../data/iconicCars";
+import { DemoBooking } from "../components/DemoBooking";
+import { priceSnapshotFor } from "../data/priceSnapshots";
 
 interface Props {
   car: IconicCar;
@@ -7,6 +9,7 @@ interface Props {
 }
 
 export function IconicCarPage({ car, onBack, onNavigate }: Props) {
+  const snapshot = priceSnapshotFor(car.slug);
   const related = iconicCars
     .filter((item) => item.slug !== car.slug)
     .slice(0, 3);
@@ -45,6 +48,36 @@ export function IconicCarPage({ car, onBack, onNavigate }: Props) {
         </span>
         <span>Illustrative image · Not a live listing</span>
       </div>
+
+      {snapshot && (
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-stone-800 bg-[#171717] p-5">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-red-400">
+              Manufacturer price snapshot · US
+            </p>
+            <p className="mt-2 font-serif text-3xl font-bold">
+              From{" "}
+              {new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD",
+                maximumFractionDigits: 0,
+              }).format(snapshot.usd)}
+            </p>
+            <p className="mt-1 text-xs text-stone-400">
+              {snapshot.modelYear} model · checked 26 October 2026 · not a
+              dealer quote or live price
+            </p>
+          </div>
+          <a
+            href={snapshot.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-lg border border-stone-600 px-4 py-2 text-sm font-semibold hover:border-red-500"
+          >
+            Verify at {snapshot.source} ↗
+          </a>
+        </div>
+      )}
 
       <div className="mt-12 grid gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(260px,0.7fr)]">
         <div>
@@ -87,6 +120,8 @@ export function IconicCarPage({ car, onBack, onNavigate }: Props) {
           </p>
         </aside>
       </div>
+
+      <DemoBooking carName={`${car.brand} ${car.name}`} />
 
       <div className="mt-16">
         <p className="text-xs font-bold uppercase tracking-[0.24em] text-red-400">
