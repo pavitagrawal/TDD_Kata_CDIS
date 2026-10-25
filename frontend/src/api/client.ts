@@ -29,6 +29,31 @@ export class ApiError extends Error {
   }
 }
 
+function errorMessage(payload: unknown, status: number): string {
+  if (
+    typeof payload !== "object" ||
+    payload === null ||
+    !("detail" in payload)
+  ) {
+    return `Request failed with status ${status}`;
+  }
+  const detail = payload.detail;
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail)) {
+    const messages = detail
+      .map((item) => {
+        if (typeof item !== "object" || item === null || !("msg" in item)) {
+          return null;
+        }
+        const message = (item as { msg: unknown }).msg;
+        return typeof message === "string" ? message : null;
+      })
+      .filter((message): message is string => message !== null);
+    if (messages.length > 0) return messages.join(" ");
+  }
+  return `Request failed with status ${status}`;
+}
+
 async function request<T>(
   path: string,
   init: RequestInit = {},
@@ -48,11 +73,7 @@ async function request<T>(
   });
   if (!response.ok) {
     const payload: unknown = await response.json().catch(() => null);
-    const message =
-      typeof payload === "object" && payload !== null && "detail" in payload
-        ? String(payload.detail)
-        : `Request failed with status ${response.status}`;
-    throw new ApiError(message, response.status);
+    throw new ApiError(errorMessage(payload, response.status), response.status);
   }
   if (response.status === 204) return undefined as T;
   return (await response.json()) as T;
