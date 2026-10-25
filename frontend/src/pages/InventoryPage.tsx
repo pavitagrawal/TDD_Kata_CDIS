@@ -112,13 +112,20 @@ export function InventoryPage({
 
       <div className="mt-8 grid grid-cols-3 gap-3 rounded-3xl border border-stone-800 bg-[#171717] p-5 text-center shadow-sm sm:p-7">
         <div>
-          <p className="text-xl font-bold sm:text-2xl">06</p>
+          <p className="text-xl font-bold sm:text-2xl">
+            {String(iconicCars.length).padStart(2, "0")}
+          </p>
           <p className="mt-1 text-xs text-stone-400 sm:text-sm">
             Iconic profiles
           </p>
         </div>
         <div className="border-x border-stone-800">
-          <p className="text-xl font-bold sm:text-2xl">03</p>
+          <p className="text-xl font-bold sm:text-2xl">
+            {String(new Set(iconicCars.map((car) => car.brand)).size).padStart(
+              2,
+              "0",
+            )}
+          </p>
           <p className="mt-1 text-xs text-stone-400 sm:text-sm">Famous makes</p>
         </div>
         <div>
