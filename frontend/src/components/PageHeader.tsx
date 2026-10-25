@@ -1,13 +1,34 @@
-export function PageHeader() {
+interface Props {
+  page: "inventory" | "login" | "register";
+  onNavigate: (page: "inventory" | "login" | "register") => void;
+}
+export function PageHeader({ page, onNavigate }: Props) {
   return (
-    <header className="border-b border-white/10 bg-slate-900/80">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-        <a className="text-lg font-semibold tracking-tight" href="/">
+    <header className="border-b border-stone-200 bg-white/90 backdrop-blur">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8">
+        <button
+          className="text-lg font-semibold tracking-tight text-stone-950"
+          onClick={() => onNavigate("inventory")}
+        >
           Northstar Motors
-        </a>
-        <span className="rounded-full bg-emerald-400/10 px-3 py-1 text-sm text-emerald-300">
-          Inventory workspace
-        </span>
+        </button>
+        <nav
+          aria-label="Primary navigation"
+          className="flex items-center gap-2"
+        >
+          <button
+            className={`rounded-lg px-3 py-2 text-sm font-medium ${page === "login" ? "bg-stone-100" : ""}`}
+            onClick={() => onNavigate("login")}
+          >
+            Sign in
+          </button>
+          <button
+            className="rounded-lg bg-stone-950 px-3 py-2 text-sm font-semibold text-white"
+            onClick={() => onNavigate("register")}
+          >
+            Register
+          </button>
+        </nav>
       </div>
     </header>
   );

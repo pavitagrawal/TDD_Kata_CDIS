@@ -8,10 +8,8 @@ describe("App", () => {
     render(<App />);
 
     expect(
-      screen.getByRole("heading", { name: /keep every vehicle visible/i }),
+      screen.getByRole("heading", { name: /exceptional vehicles/i }),
     ).toBeVisible();
-    expect(
-      screen.getByText(/inventory workflow will arrive in phase 2/i),
-    ).toBeVisible();
+    expect(screen.getByText(/curated preview/i)).toBeVisible();
   });
 });

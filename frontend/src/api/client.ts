@@ -1,5 +1,15 @@
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+import type {
+  AuthenticatedUser,
+  Credentials,
+  InventoryResponse,
+  RegisterInput,
+  RestockInput,
+  Vehicle,
+  VehicleInput,
+  VehicleQuery,
+} from "../types/domain";
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -10,15 +20,78 @@ export class ApiError extends Error {
   }
 }
 
-export async function getJson<T>(path: string): Promise<T> {
+async function request<T>(
+  path: string,
+  init: RequestInit = {},
+  token?: string,
+): Promise<T> {
   const response = await fetch(`${apiBaseUrl}${path}`, {
-    headers: { Accept: "application/json" },
+    ...init,
+    headers: {
+      Accept: "application/json",
+      ...(init.body ? { "Content-Type": "application/json" } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...init.headers,
+    },
   });
   if (!response.ok) {
-    throw new ApiError(
-      `Request failed with status ${response.status}`,
-      response.status,
-    );
+    const payload: unknown = await response.json().catch(() => null);
+    const message =
+      typeof payload === "object" && payload !== null && "detail" in payload
+        ? String(payload.detail)
+        : `Request failed with status ${response.status}`;
+    throw new ApiError(message, response.status);
   }
+  if (response.status === 204) return undefined as T;
   return (await response.json()) as T;
 }
+
+function vehiclePath(query: VehicleQuery): string {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(query))
+    if (value !== undefined && value !== "") params.set(key, String(value));
+  const suffix = params.toString();
+  return `/api/vehicles${suffix ? `/search?${suffix}` : ""}`;
+}
+
+export const api = {
+  register: (input: RegisterInput) =>
+    request<AuthenticatedUser>("/api/auth/register", {
+      method: "POST",
+      body: JSON.stringify(input),
+    }),
+  login: (input: Credentials) =>
+    request<{ access_token: string; token_type: string }>("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify(input),
+    }),
+  me: (token: string) => request<AuthenticatedUser>("/api/auth/me", {}, token),
+  vehicles: (query: VehicleQuery, token: string) =>
+    request<Vehicle[]>(vehiclePath(query), {}, token),
+  createVehicle: (input: VehicleInput, token: string) =>
+    request<Vehicle>(
+      "/api/vehicles",
+      { method: "POST", body: JSON.stringify(input) },
+      token,
+    ),
+  updateVehicle: (id: string, input: Partial<VehicleInput>, token: string) =>
+    request<Vehicle>(
+      `/api/vehicles/${id}`,
+      { method: "PUT", body: JSON.stringify(input) },
+      token,
+    ),
+  deleteVehicle: (id: string, token: string) =>
+    request<void>(`/api/vehicles/${id}`, { method: "DELETE" }, token),
+  purchase: (id: string, token: string) =>
+    request<InventoryResponse>(
+      `/api/vehicles/${id}/purchase`,
+      { method: "POST" },
+      token,
+    ),
+  restock: (id: string, input: RestockInput, token: string) =>
+    request<InventoryResponse>(
+      `/api/vehicles/${id}/restock`,
+      { method: "POST", body: JSON.stringify(input) },
+      token,
+    ),
+};
