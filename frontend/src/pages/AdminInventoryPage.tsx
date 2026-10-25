@@ -41,6 +41,9 @@ export function AdminInventoryPage() {
   const [layout, setLayout] = useState<"list" | "grid">("list");
   const [refreshing, setRefreshing] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [restockAmounts, setRestockAmounts] = useState<Record<string, number>>(
+    {},
+  );
 
   const insights = useMemo(() => inventoryInsights(vehicles), [vehicles]);
   const visible = useMemo(
@@ -140,15 +143,23 @@ export function AdminInventoryPage() {
 
   const restock = async (vehicle: Vehicle) => {
     if (!token) return;
+    const quantity = restockAmounts[vehicle.id] ?? 1;
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 10_000) {
+      setFailure("Restock quantity must be between 1 and 10,000.");
+      return;
+    }
     setFailure("");
     try {
-      const result = await api.restock(vehicle.id, { quantity: 1 }, token);
+      const result = await api.restock(vehicle.id, { quantity }, token);
       setVehicles((current) =>
         current.map((item) =>
           item.id === result.vehicle.id ? result.vehicle : item,
         ),
       );
-      setNotice(`${vehicle.make} ${vehicle.model} restocked by one unit.`);
+      setNotice(
+        `${vehicle.make} ${vehicle.model} restocked by ${quantity} ${quantity === 1 ? "unit" : "units"}.`,
+      );
+      setRestockAmounts((current) => ({ ...current, [vehicle.id]: 1 }));
     } catch (error) {
       setFailure(messageFor(error, "Unable to restock the vehicle."));
     }
@@ -544,11 +555,30 @@ export function AdminInventoryPage() {
                       >
                         Edit
                       </button>
+                      <label className="text-xs text-stone-400">
+                        <span className="sr-only">
+                          Restock quantity for {vehicle.make} {vehicle.model}
+                        </span>
+                        <input
+                          aria-label={`Restock quantity for ${vehicle.make} ${vehicle.model}`}
+                          type="number"
+                          min="1"
+                          max="10000"
+                          value={restockAmounts[vehicle.id] ?? 1}
+                          onChange={(event) =>
+                            setRestockAmounts((current) => ({
+                              ...current,
+                              [vehicle.id]: Number(event.target.value),
+                            }))
+                          }
+                          className="w-20 rounded-lg border border-stone-600 bg-stone-950 px-2 py-2 text-sm text-white"
+                        />
+                      </label>
                       <button
                         className="rounded-lg border border-stone-600 px-3 py-2 text-sm font-medium text-white hover:border-red-500"
                         onClick={() => void restock(vehicle)}
                       >
-                        Restock +1
+                        Restock
                       </button>
                       <button
                         className="rounded-lg border border-red-900 px-3 py-2 text-sm font-medium text-red-300 hover:bg-red-950"
