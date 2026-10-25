@@ -64,4 +64,35 @@ describe("App", () => {
       screen.getByRole("heading", { name: "Porsche 911 Carrera" }),
     ).toBeVisible();
   });
+
+  it("opens a dedicated showroom concept page with labelled video inspiration", () => {
+    render(<App />);
+    fireEvent.click(screen.getAllByRole("button", { name: "Details" })[0]);
+    expect(window.location.pathname).toBe("/showroom/arc");
+    expect(
+      screen.getByRole("heading", { name: "Northstar Arc" }),
+    ).toBeVisible();
+    expect(screen.getByText(/does not depict Northstar Arc/i)).toBeVisible();
+    expect(
+      screen.getByTitle(/real-car inspiration, not Northstar Arc/i),
+    ).toHaveAttribute(
+      "src",
+      "https://www.youtube-nocookie.com/embed/krQKnhMwxn4",
+    );
+  });
+
+  it("loads a showroom concept directly and lets visitors swipe the gallery", () => {
+    window.history.replaceState({}, "", "/showroom/velocity-r");
+    const { unmount } = render(<App />);
+    expect(
+      screen.getByRole("heading", { name: "Northstar Velocity R" }),
+    ).toBeVisible();
+    unmount();
+    window.history.replaceState({}, "", "/");
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Next car" }));
+    expect(
+      screen.getByRole("heading", { name: "Porsche 911 Carrera" }),
+    ).toBeVisible();
+  });
 });

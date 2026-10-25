@@ -57,6 +57,21 @@ body {
   color: #fff;
 }
 
+@keyframes carousel-reveal {
+  from {
+    opacity: 0.35;
+    transform: scale(1.035);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.carousel-enter {
+  animation: carousel-reveal 600ms ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   ::before,

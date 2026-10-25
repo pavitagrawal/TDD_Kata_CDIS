@@ -3,8 +3,10 @@ import { api, apiConfigurationMessage, ApiError } from "../api/client";
 import { useAuth } from "../auth/useAuth";
 import { VehicleDetailsDialog } from "../components/VehicleDetailsDialog";
 import { VehicleCard } from "../components/VehicleCard";
+import { FeaturedCarousel } from "../components/FeaturedCarousel";
 import { iconicCars } from "../data/iconicCars";
 import { showroomVehicles } from "../data/showroom";
+import { getShowroomProfileByVehicleId } from "../data/showroomProfiles";
 import type { Vehicle } from "../types/domain";
 
 const categories = ["All", "Electric", "SUV", "Performance"];
@@ -13,12 +15,14 @@ interface Props {
   onAddToCart: (vehicle: Vehicle) => void;
   onOpenCart: () => void;
   onOpenIconicCar: (slug: string) => void;
+  onOpenShowroomCar: (slug: string) => void;
 }
 
 export function InventoryPage({
   onAddToCart,
   onOpenCart,
   onOpenIconicCar,
+  onOpenShowroomCar,
 }: Props) {
   const { token } = useAuth();
   const [liveVehicles, setLiveVehicles] = useState<Vehicle[]>([]);
@@ -137,6 +141,11 @@ export function InventoryPage({
           </p>
         </div>
       </div>
+
+      <FeaturedCarousel
+        onOpenIconic={onOpenIconicCar}
+        onOpenShowroom={onOpenShowroomCar}
+      />
 
       <div id="explore" className="scroll-mt-24 pt-16 sm:pt-24">
         <p className="text-xs font-bold uppercase tracking-[0.26em] text-red-500">
@@ -302,7 +311,10 @@ export function InventoryPage({
               key={vehicle.id}
               vehicle={vehicle}
               onAddToCart={addVehicle}
-              onView={setSelected}
+              onView={(vehicle) => {
+                const profile = getShowroomProfileByVehicleId(vehicle.id);
+                if (profile) onOpenShowroomCar(profile.slug);
+              }}
             />
           ))}
         </div>

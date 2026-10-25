@@ -9,11 +9,13 @@ import {
 } from "./cart/cart";
 import { PageHeader } from "./components/PageHeader";
 import { getIconicCar } from "./data/iconicCars";
+import { getShowroomProfile } from "./data/showroomProfiles";
 import { AdminInventoryPage } from "./pages/AdminInventoryPage";
 import { AuthPage } from "./pages/AuthPage";
 import { CartPage } from "./pages/CartPage";
 import { InventoryPage } from "./pages/InventoryPage";
 import { IconicCarPage } from "./pages/IconicCarPage";
+import { ShowroomCarPage } from "./pages/ShowroomCarPage";
 import type { Vehicle } from "./types/domain";
 
 export function App() {
@@ -43,8 +45,18 @@ export function App() {
     setPath(nextPath);
     window.scrollTo?.(0, 0);
   };
+  const openShowroomCar = (slug: string) => {
+    const nextPath = `/showroom/${slug}`;
+    window.history.pushState({}, "", nextPath);
+    setPath(nextPath);
+    window.scrollTo?.(0, 0);
+  };
   const carSlug = path.match(/^\/cars\/([^/]+)\/?$/)?.[1];
   const iconicCar = carSlug ? getIconicCar(carSlug) : undefined;
+  const showroomSlug = path.match(/^\/showroom\/([^/]+)\/?$/)?.[1];
+  const showroomProfile = showroomSlug
+    ? getShowroomProfile(showroomSlug)
+    : undefined;
   const addVehicle = (vehicle: Vehicle) =>
     setCart((current) => addToCart(current, vehicle));
   return (
@@ -55,7 +67,25 @@ export function App() {
         cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)}
       />
       <main className="mx-auto max-w-7xl px-5 py-7 sm:px-8 sm:py-10">
-        {carSlug ? (
+        {showroomSlug ? (
+          showroomProfile ? (
+            <ShowroomCarPage
+              profile={showroomProfile}
+              onBack={() => navigatePage("inventory")}
+              onNavigate={openShowroomCar}
+            />
+          ) : (
+            <div className="py-24 text-center">
+              <h1 className="text-4xl font-bold">Showroom car not found</h1>
+              <button
+                className="mt-6 rounded-full bg-red-600 px-6 py-3 font-semibold"
+                onClick={() => navigatePage("inventory")}
+              >
+                Browse cars
+              </button>
+            </div>
+          )
+        ) : carSlug ? (
           iconicCar ? (
             <IconicCarPage
               car={iconicCar}
@@ -78,6 +108,7 @@ export function App() {
             onAddToCart={addVehicle}
             onOpenCart={() => navigatePage("cart")}
             onOpenIconicCar={openIconicCar}
+            onOpenShowroomCar={openShowroomCar}
           />
         ) : page === "cart" ? (
           <CartPage
@@ -107,6 +138,7 @@ export function App() {
               onAddToCart={addVehicle}
               onOpenCart={() => navigatePage("cart")}
               onOpenIconicCar={openIconicCar}
+              onOpenShowroomCar={openShowroomCar}
             />
           )
         ) : (

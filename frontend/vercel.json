@@ -1,3 +1,6 @@
 {
-  "rewrites": [{ "source": "/cars/:slug", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/cars/:slug", "destination": "/index.html" },
+    { "source": "/showroom/:slug", "destination": "/index.html" }
+  ]
 }
