@@ -60,7 +60,9 @@ export function App() {
           page !== "cart" &&
           (page === "admin" ? (
             user?.role === "admin" ? (
-              <AdminInventoryPage />
+              <div className="admin-theme">
+                <AdminInventoryPage />
+              </div>
             ) : (
               <InventoryPage
                 onAddToCart={addVehicle}

@@ -14,7 +14,7 @@
 
 body {
   margin: 0;
-  min-width: 320px;
+  min-width: 0;
   min-height: 100vh;
 }
 
@@ -30,6 +30,31 @@ body {
 .field:focus {
   border-color: oklch(0.2 0 0);
   box-shadow: 0 0 0 3px oklch(0.2 0 0 / 0.12);
+}
+
+.admin-theme .bg-white {
+  background-color: #171717;
+}
+.admin-theme .border-stone-200 {
+  border-color: #333;
+}
+.admin-theme .text-stone-950,
+.admin-theme .text-stone-800 {
+  color: #fff;
+}
+.admin-theme .text-stone-600 {
+  color: #b5b5b5;
+}
+.admin-theme .text-amber-700 {
+  color: #ef4444;
+}
+.admin-theme .bg-stone-950 {
+  background-color: #dc2626;
+}
+.admin-theme .field {
+  background: #262626;
+  border-color: #444;
+  color: #fff;
 }
 
 @media (prefers-reduced-motion: reduce) {

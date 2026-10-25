@@ -11,13 +11,13 @@ export function PageHeader({ page, onNavigate, cartCount }: Props) {
   const { isAuthenticated, logout, user } = useAuth();
   return (
     <header className="sticky top-0 z-30 border-b border-stone-800 bg-black/95 backdrop-blur">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-5 py-4 sm:px-8">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-5 py-4 sm:flex-nowrap sm:px-8">
         <button
           className="text-lg font-black tracking-[-0.06em] text-white sm:text-xl"
           onClick={() => onNavigate("inventory")}
         >
           <span className="text-red-600">N</span>ORTHSTAR
-          <span className="ml-1 text-sm font-medium tracking-normal text-stone-500">
+          <span className="ml-1 hidden text-sm font-medium tracking-normal text-stone-500 sm:inline">
             MOTORS
           </span>
         </button>
@@ -29,7 +29,7 @@ export function PageHeader({ page, onNavigate, cartCount }: Props) {
         </button>
         <nav
           aria-label="Primary navigation"
-          className="flex items-center gap-2"
+          className="flex w-full items-center justify-end gap-2 sm:w-auto"
         >
           <button
             className="relative rounded-full px-3 py-2 text-sm font-semibold text-white hover:bg-stone-900"
