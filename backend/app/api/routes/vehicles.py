@@ -5,6 +5,7 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, Query, Response, status
 
 from app.api.deps import AdminUser, CurrentUser, DatabaseSession
+from app.models.vehicle import Vehicle
 from app.schemas.vehicle import (
     InventoryResponse,
     RestockRequest,
@@ -27,6 +28,7 @@ from app.services.vehicles import (
 router = APIRouter(prefix="/api/vehicles", tags=["vehicles"])
 PaginationOffset = Annotated[int, Query(ge=0, le=10_000)]
 PaginationLimit = Annotated[int, Query(ge=1, le=100)]
+PriceFilter = Annotated[Decimal | None, Query(ge=0)]
 
 
 def not_found() -> HTTPException:
@@ -34,12 +36,17 @@ def not_found() -> HTTPException:
 
 
 @router.post("", response_model=VehicleResponse, status_code=status.HTTP_201_CREATED)
-def create(request: VehicleCreate, session: DatabaseSession, _: AdminUser) -> VehicleResponse:
+def create(request: VehicleCreate, session: DatabaseSession, _: AdminUser) -> Vehicle:
     return create_vehicle(session, request)
 
 
 @router.get("", response_model=list[VehicleResponse])
-def list_all(session: DatabaseSession, _: CurrentUser, offset: PaginationOffset = 0, limit: PaginationLimit = 20) -> list[VehicleResponse]:
+def list_all(
+    session: DatabaseSession,
+    _: CurrentUser,
+    offset: PaginationOffset = 0,
+    limit: PaginationLimit = 20,
+) -> list[Vehicle]:
     return list_vehicles(session, offset=offset, limit=limit)
 
 
@@ -50,19 +57,31 @@ def search(
     make: str | None = None,
     model: str | None = None,
     category: str | None = None,
-    min_price: Decimal | None = Query(default=None, ge=0),
-    max_price: Decimal | None = Query(default=None, ge=0),
+    min_price: PriceFilter = None,
+    max_price: PriceFilter = None,
     offset: PaginationOffset = 0,
     limit: PaginationLimit = 20,
-) -> list[VehicleResponse]:
+) -> list[Vehicle]:
     try:
-        return list_vehicles(session, make=make, model=model, category=category, min_price=min_price, max_price=max_price, offset=offset, limit=limit)
+        return list_vehicles(
+            session,
+            make=make,
+            model=model,
+            category=category,
+            min_price=min_price,
+            max_price=max_price,
+            offset=offset,
+            limit=limit,
+        )
     except ValueError as error:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(error)) from error
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(error),
+        ) from error
 
 
 @router.get("/{vehicle_id}", response_model=VehicleResponse)
-def get_one(vehicle_id: UUID, session: DatabaseSession, _: CurrentUser) -> VehicleResponse:
+def get_one(vehicle_id: UUID, session: DatabaseSession, _: CurrentUser) -> Vehicle:
     try:
         return get_vehicle(session, vehicle_id)
     except VehicleNotFoundError:
@@ -70,7 +89,12 @@ def get_one(vehicle_id: UUID, session: DatabaseSession, _: CurrentUser) -> Vehic
 
 
 @router.put("/{vehicle_id}", response_model=VehicleResponse)
-def update(vehicle_id: UUID, request: VehicleUpdate, session: DatabaseSession, _: AdminUser) -> VehicleResponse:
+def update(
+    vehicle_id: UUID,
+    request: VehicleUpdate,
+    session: DatabaseSession,
+    _: AdminUser,
+) -> Vehicle:
     try:
         return update_vehicle(session, vehicle_id, request)
     except VehicleNotFoundError:
@@ -93,12 +117,20 @@ def purchase(vehicle_id: UUID, session: DatabaseSession, _: CurrentUser) -> Inve
     except VehicleNotFoundError:
         raise not_found() from None
     except InventoryUnavailableError:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="vehicle is out of stock") from None
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="vehicle is out of stock",
+        ) from None
     return InventoryResponse(message="purchase completed", vehicle=vehicle)
 
 
 @router.post("/{vehicle_id}/restock", response_model=InventoryResponse)
-def restock(vehicle_id: UUID, request: RestockRequest, session: DatabaseSession, _: AdminUser) -> InventoryResponse:
+def restock(
+    vehicle_id: UUID,
+    request: RestockRequest,
+    session: DatabaseSession,
+    _: AdminUser,
+) -> InventoryResponse:
     try:
         vehicle = restock_vehicle(session, vehicle_id, request.quantity)
     except VehicleNotFoundError:

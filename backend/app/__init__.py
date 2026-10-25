@@ -1,2 +1,1 @@
 """Car Dealership Inventory API."""
-

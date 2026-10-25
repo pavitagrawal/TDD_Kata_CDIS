@@ -2,7 +2,12 @@ from datetime import timedelta
 
 import pytest
 
-from app.core.security import create_access_token, decode_access_token, hash_password, verify_password
+from app.core.security import (
+    create_access_token,
+    decode_access_token,
+    hash_password,
+    verify_password,
+)
 
 
 def test_password_hash_is_not_the_original_password() -> None:
@@ -28,4 +33,3 @@ def test_expired_access_token_is_rejected() -> None:
 
     with pytest.raises(ValueError, match="expired"):
         decode_access_token(token)
-

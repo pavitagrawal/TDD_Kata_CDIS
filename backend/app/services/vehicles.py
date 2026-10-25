@@ -59,7 +59,8 @@ def list_vehicles(
         statement = statement.where(Vehicle.price >= min_price)
     if max_price is not None:
         statement = statement.where(Vehicle.price <= max_price)
-    return list(session.scalars(statement.order_by(Vehicle.created_at.asc(), Vehicle.id.asc()).offset(offset).limit(limit)))
+    statement = statement.order_by(Vehicle.created_at.asc(), Vehicle.id.asc())
+    return list(session.scalars(statement.offset(offset).limit(limit)))
 
 
 def update_vehicle(session: Session, vehicle_id: UUID, request: VehicleUpdate) -> Vehicle:

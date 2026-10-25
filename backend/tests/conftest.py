@@ -37,4 +37,3 @@ def db_session() -> Generator[Session, None, None]:
         transaction.rollback()
         connection.close()
         test_engine.dispose()
-

@@ -12,7 +12,11 @@ class DuplicateEmailError(Exception):
 
 
 def register_user(session: Session, request: RegisterRequest) -> User:
-    user = User(email=str(request.email).lower(), password_hash=hash_password(request.password), role=UserRole.USER)
+    user = User(
+        email=str(request.email).lower(),
+        password_hash=hash_password(request.password),
+        role=UserRole.USER,
+    )
     session.add(user)
     try:
         session.commit()
