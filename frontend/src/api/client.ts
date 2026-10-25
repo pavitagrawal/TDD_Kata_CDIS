@@ -9,7 +9,16 @@ import type {
   VehicleQuery,
 } from "../types/domain";
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+const apiBaseUrl = configuredApiBaseUrl
+  ? configuredApiBaseUrl.replace(/\/$/, "")
+  : import.meta.env.DEV
+    ? "http://localhost:8000"
+    : "";
+
+export const apiConfigurationMessage = apiBaseUrl
+  ? null
+  : "This deployment is missing VITE_API_BASE_URL. Set it to the public HTTPS backend URL in Vercel, then redeploy.";
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -25,6 +34,9 @@ async function request<T>(
   init: RequestInit = {},
   token?: string,
 ): Promise<T> {
+  if (apiConfigurationMessage) {
+    throw new ApiError(apiConfigurationMessage, 503);
+  }
   const response = await fetch(`${apiBaseUrl}${path}`, {
     ...init,
     headers: {

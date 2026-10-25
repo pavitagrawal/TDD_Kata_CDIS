@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, ApiError } from "../api/client";
+import { api, apiConfigurationMessage, ApiError } from "../api/client";
 import { useAuth } from "../auth/useAuth";
 import { FilterBar } from "../components/FilterBar";
 import { VehicleDetailsDialog } from "../components/VehicleDetailsDialog";
@@ -139,6 +139,14 @@ export function InventoryPage() {
           role="status"
         >
           {message}
+        </p>
+      )}
+      {apiConfigurationMessage && (
+        <p
+          className="mt-5 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-900"
+          role="alert"
+        >
+          {apiConfigurationMessage}
         </p>
       )}
       <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
