@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes.health import router as health_router
+from app.api.routes.auth import router as auth_router
+from app.api.routes.vehicles import router as vehicles_router
 from app.core.config import get_settings
 
 
@@ -21,6 +23,8 @@ def create_app() -> FastAPI:
         allow_headers=["Authorization", "Content-Type"],
     )
     application.include_router(health_router)
+    application.include_router(auth_router)
+    application.include_router(vehicles_router)
     return application
 
 

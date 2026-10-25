@@ -5,6 +5,7 @@ from sqlalchemy import engine_from_config, pool
 
 from app.core.config import get_settings
 from app.db.base import Base
+from app.models import User, Vehicle  # noqa: F401
 
 config = context.config
 config.set_main_option("sqlalchemy.url", str(get_settings().database_url))

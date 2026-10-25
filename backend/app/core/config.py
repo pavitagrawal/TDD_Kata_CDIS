@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     app_env: Literal["development", "test", "production"] = "development"
     database_url: AnyUrl
     cors_origins: list[str] = ["http://localhost:5173"]
+    jwt_secret: str
+    access_token_expire_minutes: int = 30
 
     model_config = SettingsConfigDict(
         env_file=("../.env", ".env"),
@@ -22,6 +24,20 @@ class Settings(BaseSettings):
     def require_postgresql(cls, value: AnyUrl) -> AnyUrl:
         if value.scheme not in {"postgresql", "postgresql+psycopg"}:
             raise ValueError("DATABASE_URL must use PostgreSQL with the psycopg driver")
+        return value
+
+    @field_validator("jwt_secret")
+    @classmethod
+    def require_strong_jwt_secret(cls, value: str) -> str:
+        if len(value) < 32:
+            raise ValueError("JWT_SECRET must contain at least 32 characters")
+        return value
+
+    @field_validator("access_token_expire_minutes")
+    @classmethod
+    def require_sensible_token_expiry(cls, value: int) -> int:
+        if not 1 <= value <= 1_440:
+            raise ValueError("ACCESS_TOKEN_EXPIRE_MINUTES must be between 1 and 1440")
         return value
 
 

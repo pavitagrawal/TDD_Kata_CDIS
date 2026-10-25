@@ -10,6 +10,7 @@ os.environ.setdefault(
     "postgresql+psycopg://test_user:test_password@localhost:5432/dealership_test",
 )
 os.environ.setdefault("APP_ENV", "test")
+os.environ.setdefault("JWT_SECRET", "test-secret-that-is-at-least-thirty-two-characters")
 
 
 def _require_safe_test_database(url: str) -> None:
