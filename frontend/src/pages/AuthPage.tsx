@@ -48,8 +48,8 @@ export function AuthPage({ mode, onComplete }: Props) {
       <h1 className="mt-3 text-4xl font-semibold text-stone-950">{title}</h1>
       <p className="mt-3 text-stone-600">
         {mode === "login"
-          ? "Sign in to browse live inventory and reserve a vehicle."
-          : "Registration creates a standard customer account."}
+          ? "Sign in to reserve a vehicle from live inventory. You can browse the showroom without an account."
+          : "Create an account to reserve cars from live inventory. The showroom is open to everyone."}
       </p>
       <form
         className="mt-8 space-y-5 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm"

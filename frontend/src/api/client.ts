@@ -99,7 +99,7 @@ export const api = {
       body: JSON.stringify(input),
     }),
   me: (token: string) => request<AuthenticatedUser>("/api/auth/me", {}, token),
-  vehicles: (query: VehicleQuery, token: string) =>
+  vehicles: (query: VehicleQuery, token?: string) =>
     request<Vehicle[]>(vehiclePath(query), {}, token),
   createVehicle: (input: VehicleInput, token: string) =>
     request<Vehicle>(

@@ -43,7 +43,6 @@ def create(request: VehicleCreate, session: DatabaseSession, _: AdminUser) -> Ve
 @router.get("", response_model=list[VehicleResponse])
 def list_all(
     session: DatabaseSession,
-    _: CurrentUser,
     offset: PaginationOffset = 0,
     limit: PaginationLimit = 20,
 ) -> list[Vehicle]:
@@ -53,7 +52,6 @@ def list_all(
 @router.get("/search", response_model=list[VehicleResponse])
 def search(
     session: DatabaseSession,
-    _: CurrentUser,
     make: str | None = None,
     model: str | None = None,
     category: str | None = None,
@@ -81,7 +79,7 @@ def search(
 
 
 @router.get("/{vehicle_id}", response_model=VehicleResponse)
-def get_one(vehicle_id: UUID, session: DatabaseSession, _: CurrentUser) -> Vehicle:
+def get_one(vehicle_id: UUID, session: DatabaseSession) -> Vehicle:
     try:
         return get_vehicle(session, vehicle_id)
     except VehicleNotFoundError:
