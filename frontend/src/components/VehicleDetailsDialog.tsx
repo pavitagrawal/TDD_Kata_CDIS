@@ -14,43 +14,43 @@ export function VehicleDetailsDialog({ vehicle, onClose }: Props) {
   }).format(Number(vehicle.price));
   return (
     <div
-      className="fixed inset-0 z-40 grid place-items-center bg-stone-950/50 p-4"
+      className="fixed inset-0 z-40 grid place-items-center bg-black/80 p-4"
       role="presentation"
     >
       <section
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-7 shadow-2xl"
+        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-stone-700 bg-[#171717] p-7 text-white shadow-2xl"
         role="dialog"
         aria-modal="true"
         aria-labelledby="vehicle-title"
       >
         <button
-          className="float-right rounded-lg px-2 py-1 text-stone-600 focus:outline-none focus:ring-2 focus:ring-stone-900"
+          className="float-right rounded-lg px-2 py-1 text-stone-300 focus:outline-none focus:ring-2 focus:ring-red-500"
           onClick={onClose}
           aria-label="Close vehicle details"
         >
           ×
         </button>
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-700">
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-red-500">
           {vehicle.category}
         </p>
         <img
-          className="mt-5 w-full rounded-2xl bg-stone-100"
+          className="mt-5 w-full rounded-2xl bg-stone-900"
           src={vehicleImage(vehicle)}
           alt={`${vehicle.make} ${vehicle.model}`}
         />
         <h2
           id="vehicle-title"
-          className="mt-3 text-3xl font-semibold text-stone-950"
+          className="mt-3 text-3xl font-semibold text-white"
         >
           {vehicle.make} {vehicle.model}
         </h2>
         <dl className="mt-7 grid grid-cols-2 gap-5">
           <div>
-            <dt className="text-sm text-stone-500">Price</dt>
+            <dt className="text-sm text-stone-400">Price</dt>
             <dd className="mt-1 text-xl font-semibold">{price}</dd>
           </div>
           <div>
-            <dt className="text-sm text-stone-500">Availability</dt>
+            <dt className="text-sm text-stone-400">Availability</dt>
             <dd className="mt-1 text-xl font-semibold">
               {isShowroomVehicle(vehicle)
                 ? "Showroom concept"
@@ -61,13 +61,13 @@ export function VehicleDetailsDialog({ vehicle, onClose }: Props) {
           </div>
         </dl>
         {isShowroomVehicle(vehicle) && (
-          <p className="mt-5 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
-            Illustrative model and price. This car is not in live inventory and
-            cannot be reserved.
+          <p className="mt-5 rounded-xl border border-red-900 bg-red-950 p-3 text-sm text-red-100">
+            Illustrative model and price. You can try demo checkout; no payment
+            or reservation is made.
           </p>
         )}
         <button
-          className="mt-8 rounded-lg bg-stone-950 px-4 py-3 font-semibold text-white"
+          className="mt-8 rounded-full bg-red-600 px-5 py-3 font-semibold text-white"
           onClick={onClose}
         >
           Done

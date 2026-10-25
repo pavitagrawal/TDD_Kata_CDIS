@@ -22,4 +22,19 @@ describe("App", () => {
     expect(screen.getByText("Roam XL")).toBeVisible();
     expect(screen.queryByText("Arc GT")).not.toBeInTheDocument();
   });
+
+  it("adds a concept to the cart and completes demo checkout", () => {
+    render(<App />);
+    fireEvent.click(screen.getAllByRole("button", { name: "Add to cart" })[0]);
+    fireEvent.click(screen.getByRole("button", { name: /cart 1/i }));
+    expect(screen.getByRole("heading", { name: "Your cart" })).toBeVisible();
+    expect(
+      screen.getByText(/no payment, order, or vehicle reservation/i),
+    ).toBeVisible();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Complete demo checkout" }),
+    );
+    expect(screen.getByText(/demo checkout complete/i)).toBeVisible();
+    expect(screen.getByText(/your cart is empty/i)).toBeVisible();
+  });
 });

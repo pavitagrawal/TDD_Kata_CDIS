@@ -42,34 +42,34 @@ export function AuthPage({ mode, onComplete }: Props) {
   const title = mode === "login" ? "Welcome back" : "Create your account";
   return (
     <section className="mx-auto max-w-md py-12">
-      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-700">
+      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-red-500">
         Northstar Motors
       </p>
-      <h1 className="mt-3 text-4xl font-semibold text-stone-950">{title}</h1>
-      <p className="mt-3 text-stone-600">
+      <h1 className="mt-3 text-4xl font-semibold text-white">{title}</h1>
+      <p className="mt-3 text-stone-400">
         {mode === "login"
           ? "Sign in to reserve a vehicle from live inventory. You can browse the showroom without an account."
           : "Create an account to reserve cars from live inventory. The showroom is open to everyone."}
       </p>
       <form
-        className="mt-8 space-y-5 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm"
+        className="mt-8 space-y-5 rounded-2xl border border-stone-800 bg-[#171717] p-6 shadow-sm"
         onSubmit={(event) => void submit(event)}
         noValidate
       >
-        <label className="block text-sm font-medium text-stone-800">
+        <label className="block text-sm font-medium text-stone-200">
           Email
           <input
-            className="field mt-2 w-full"
+            className="field mt-2 w-full border-stone-700! bg-stone-900! text-white!"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             autoComplete="email"
           />
         </label>
-        <label className="block text-sm font-medium text-stone-800">
+        <label className="block text-sm font-medium text-stone-200">
           Password
           <input
-            className="field mt-2 w-full"
+            className="field mt-2 w-full border-stone-700! bg-stone-900! text-white!"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -80,14 +80,14 @@ export function AuthPage({ mode, onComplete }: Props) {
         </label>
         {error && (
           <p
-            className="rounded-lg bg-rose-50 p-3 text-sm text-rose-800"
+            className="rounded-lg bg-red-950 p-3 text-sm text-red-100"
             role="alert"
           >
             {error}
           </p>
         )}
         <button
-          className="w-full rounded-lg bg-stone-950 px-4 py-3 font-semibold text-white disabled:bg-stone-300"
+          className="w-full rounded-full bg-red-600 px-4 py-3 font-semibold text-white disabled:bg-stone-700"
           disabled={pending}
         >
           {pending

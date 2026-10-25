@@ -30,6 +30,15 @@ export function isShowroomVehicle(vehicle: Vehicle): boolean {
 }
 
 export function vehicleImage(vehicle: Vehicle): string {
+  const modelImages: Record<string, string> = {
+    "showroom-northstar-arc": "/images/arc.png",
+    "showroom-northstar-arc-gt": "/images/arc-gt.png",
+    "showroom-northstar-roam": "/images/roam.png",
+    "showroom-northstar-roam-xl": "/images/roam-xl.png",
+    "showroom-northstar-velocity": "/images/velocity.png",
+    "showroom-northstar-velocity-r": "/images/velocity-r.png",
+  };
+  if (modelImages[vehicle.id]) return modelImages[vehicle.id];
   const category = vehicle.category.toLowerCase();
   if (category.includes("suv") || category.includes("utility"))
     return "/images/luxury-suv.png";
