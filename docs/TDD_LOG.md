@@ -25,7 +25,6 @@ failure. It is preserved verbatim so the unavailable runtime is not misrepresent
 ### Green
 
 Added the minimal FastAPI route, response schema, service, application factory, and explicit test
-configuration. A bundled Python 3.12.14 runtime was later found and syntax compilation passed, but
-the test could not execute because repeated PyPI dependency installation attempts timed out. CI is
+configuration. The test has not been executed locally because Python 3.12+ is not installed. CI is
 configured to run it under Python 3.12 with PostgreSQL.
 

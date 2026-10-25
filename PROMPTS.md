@@ -5,7 +5,7 @@ or fictional history.
 
 ## 2026-10-25 — Phase 1 foundation
 
-### Raw user prompt
+### Verbatim prompt excerpt
 
 ```text
 # PHASE 1: Establish a Professional Software Craftsmanship Foundation
@@ -168,5 +168,44 @@ Plan:
 5. Run every check the machine supports, document unavailable prerequisites precisely, and create focused commits only after inspecting Git status.
 
 The main local constraint is that no Python runtime, PostgreSQL client/server, or Docker is installed. I can still build the backend and CI correctly, but local backend execution and migration connectivity cannot honestly be marked as passed.
+```
+
+## 2026-10-25 — Phase 2 backend
+
+### Exact request summary
+
+```text
+# PHASE 2: Build the Complete Backend Using Strict TDD
+
+Continue the existing Car Dealership Inventory System. Act as a senior backend engineer and TDD coach.
+
+Read the current repository, architecture, test configuration, Git history, and Phase 1 completion report before making changes. Preserve the established conventions. Do not rebuild the project from scratch.
+
+The complete prompt is retained in the original session attachment. This exact summary records the scope acted on: PostgreSQL User and Vehicle models; registration, login, current-user JWT authentication; role-gated vehicle CRUD, search, purchase, and restock endpoints; Decimal-compatible prices; database constraints; bounded pagination; concurrency-safe purchase; Alembic migrations; tests; OpenAPI; seed instructions; and documentation. It requires strict TDD, actual check reporting, and no frontend work.
+```
+
+### Raw assistant response (working update)
+
+```text
+The first new test run is genuinely red: the project virtual environment still has no pytest because PyPI installation timed out during Phase 1. I’m preserving that actual result and adding the smallest complete implementation beneath the test contracts; CI will execute the dependency-backed suite with PostgreSQL.
+```
+
+## 2026-10-25 — Phase 4 hardening
+
+### Exact request summary
+
+```text
+Complete outstanding Phase 3 work, then conduct an evidence-based hardening review. Strengthen tests,
+correct confirmed security, validation, reliability, CI, and accessibility issues; report only actual
+measurements and remaining risks.
+```
+
+### Raw assistant response (working update)
+
+```text
+I found two confirmed backend validation gaps worth fixing immediately: token expiry accepts non-positive
+values, and vehicle text fields permit whitespace-only input. I’ll add focused specifications first,
+apply the smallest validation changes, then close the UI’s missing details/admin paths and document the
+evidence-based review.
 ```
 
