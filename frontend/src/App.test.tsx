@@ -10,6 +10,6 @@ describe("App", () => {
     expect(
       screen.getByRole("heading", { name: /exceptional vehicles/i }),
     ).toBeVisible();
-    expect(screen.getByText(/curated preview/i)).toBeVisible();
+    expect(screen.getByText(/sign in to search live inventory/i)).toBeVisible();
   });
 });

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api, ApiError } from "../api/client";
 import { useAuth } from "../auth/useAuth";
 import { FilterBar } from "../components/FilterBar";
@@ -42,30 +42,39 @@ const demoVehicles: Vehicle[] = [
 export function InventoryPage() {
   const { token, isAuthenticated } = useAuth();
   const [query, setQuery] = useState<VehicleQuery>({});
+  const [requestedQuery, setRequestedQuery] = useState<VehicleQuery>({});
   const [vehicles, setVehicles] = useState<Vehicle[]>(demoVehicles);
   const [message, setMessage] = useState(
-    "Showing a curated preview while you connect the API.",
+    "Previewing sample vehicles. Sign in to search live inventory.",
   );
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(token !== null);
   const [purchasing, setPurchasing] = useState<string | null>(null);
   const [selected, setSelected] = useState<Vehicle | null>(null);
-  const load = async () => {
-    if (!token) {
-      setMessage("Sign in to search live inventory.");
-      return;
-    }
-    setLoading(true);
-    try {
-      setVehicles(await api.vehicles(query, token));
-      setMessage("");
-    } catch (error) {
-      setMessage(
-        error instanceof ApiError ? error.message : "Unable to load inventory.",
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    if (!token) return;
+    let active = true;
+    api
+      .vehicles(requestedQuery, token)
+      .then((data) => {
+        if (!active) return;
+        setVehicles(data);
+        setMessage("");
+      })
+      .catch((error: unknown) => {
+        if (!active) return;
+        setMessage(
+          error instanceof ApiError
+            ? error.message
+            : "Unable to load inventory.",
+        );
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [requestedQuery, token]);
   const purchase = async (vehicle: Vehicle) => {
     if (!token) {
       setMessage("Please sign in before purchasing a vehicle.");
@@ -115,7 +124,14 @@ export function InventoryPage() {
       <FilterBar
         query={query}
         onChange={setQuery}
-        onSubmit={() => void load()}
+        onSubmit={() => {
+          if (!token) {
+            setMessage("Sign in to search live inventory.");
+            return;
+          }
+          setLoading(true);
+          setRequestedQuery({ ...query });
+        }}
       />
       {message && (
         <p
